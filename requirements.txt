@@ -1,0 +1,10 @@
+# These are additional requirements on top of what's installed in the NVIDIA
+# PyTorch image
+transformers==2.2.1
+click==7.0
+click-log==0.3.2
+discord.py==1.2.5
+black==19.10b0
+flake8==3.7.9
+isort==4.3.21
+mypy==0.750

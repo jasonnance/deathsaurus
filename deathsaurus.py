@@ -1,15 +1,17 @@
 import enum
 import logging
+import os
 from typing import Tuple
 
 import click
+import discord
 import torch
 import torch.nn as nn
 import transformers
 
 from generate import generate_text
 
-GENERATE_LEN = 400
+GENERATE_LEN = 200
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -18,10 +20,14 @@ logging.basicConfig(
     level=logging.INFO,
 )
 
+discord_client = discord.Client()
+
+COMMAND_PREFIX = "!xfm"
+
 
 class Command(enum.Enum):
-    HELP = "!xfm_help"
-    GENERATE_TEXT = "!xfm_gen"
+    HELP = f"{COMMAND_PREFIX}_help"
+    GENERATE_TEXT = f"{COMMAND_PREFIX}_gen"
 
 
 class InvalidCommandError(Exception):
@@ -45,18 +51,12 @@ def parse_cmd(cmd_str: str) -> Tuple[Command, str]:
     return cmd, cmd_text
 
 
-def discord_loop(
-    model: nn.Module, tokenizer: transformers.PreTrainedTokenizer, device: torch.device
-):
-    raise NotImplementedError
-
-
 USAGE_STR = "\n".join(
     (
         "Deathsaurus is a bot that can perform a few different tasks using Transformer-based deep learning models.",
         "The currently-supported tasks are:",
-        "  !xfm_help: Show this help text.",
-        "  !xfm_gen <text>: Generate text, using <text> as the starting seed text.",
+        f"  {COMMAND_PREFIX}_help: Show this help text.",
+        f"  {COMMAND_PREFIX}_gen <text>: Generate text, using <text> as the starting seed text.",
     )
 )
 
@@ -67,6 +67,7 @@ def handle_cmd(
     model: nn.Module,
     tokenizer: transformers.PreTrainedTokenizer,
     device: torch.device,
+    markdown: bool = False,
 ) -> str:
     if cmd == Command.HELP:
         return USAGE_STR
@@ -81,9 +82,102 @@ def handle_cmd(
             length=GENERATE_LEN,
         )
 
-        return "\n".join((text, generated_text))
+        if markdown:
+            return f"**{text}**{generated_text}"
+        else:
+            return f"{text}{generated_text}"
     else:
         raise InvalidCommandError(f"Unimplemented command: {cmd}")
+
+
+def _verify_env(var_name: str, err_msg: str) -> str:
+    try:
+        return os.environ[var_name]
+    except KeyError:
+        raise RuntimeError(err_msg)
+
+
+class DeathsaurusClient(discord.Client):
+    def __init__(
+        self,
+        guild: str,
+        channel: str,
+        model: nn.Module,
+        tokenizer: transformers.PreTrainedTokenizer,
+        device: torch.device,
+        **options,
+    ):
+        super().__init__(**options)
+        self.guild_name = guild
+        self.channel_name = channel
+        self.model = model
+        self.tokenizer = tokenizer
+        self.device = device
+
+    async def on_ready(self):
+        my_guild = None
+        for g in self.guilds:
+            if g.name == self.guild_name:
+                my_guild = g
+        if my_guild is None:
+            raise RuntimeError(f"Couldn't find guild named {self.guild_name}")
+        self.guild = my_guild
+
+        my_channel = None
+        for c in self.guild.channels:
+            if c.name == self.channel_name:
+                my_channel = c
+        if my_channel is None:
+            raise RuntimeError(
+                f"Couldn't find channel named {self.channel_name} in guild {self.guild_name}"
+            )
+        self.channel = my_channel
+
+        logger.info("Discord bot logged in.")
+        await self.channel.send(":robot: Deathsaurus _online_.")
+
+    async def on_message(self, message):
+        # Ignore our own messages and messages that aren't in the guild we're watching
+        self_message = message.author == self.user
+        other_guild_message = message.guild != self.guild
+        has_command = message.content.startswith(COMMAND_PREFIX)
+
+        if self_message or other_guild_message or not has_command:
+            return
+
+        async with self.channel.typing():
+            try:
+                cmd, text = parse_cmd(message.content)
+                cmd_output = handle_cmd(
+                    cmd, text, self.model, self.tokenizer, self.device, markdown=True
+                )
+            except InvalidCommandError as e:
+                cmd_output = f"ERROR: {str(e)}"
+
+            await self.channel.send(cmd_output)
+
+    async def on_disconnect(self):
+        await self.chanel.send(":wave: Deathsaurus signing off.")
+
+
+def discord_loop(
+    model: nn.Module, tokenizer: transformers.PreTrainedTokenizer, device: torch.device
+):
+    discord_token = _verify_env(
+        "DISCORD_BOT_TOKEN",
+        "Environment variable DISCORD_BOT_TOKEN must be set to the bot token for login.",
+    )
+    discord_guild = _verify_env(
+        "DISCORD_BOT_GUILD",
+        "Environment variable DISCORD_BOT_GUILD must be set to the server name to listen on.",
+    )
+    discord_channel = _verify_env(
+        "DISCORD_BOT_CHANNEL",
+        "Environment variable DISCORD_BOT_CHANNEL must be set to the channel name to post in.",
+    )
+
+    client = DeathsaurusClient(discord_guild, discord_channel, model, tokenizer, device)
+    client.run(discord_token)
 
 
 @click.command()
@@ -92,7 +186,7 @@ def handle_cmd(
     help="Transformer model weights to use.  The model must "
     "be the name of one of the pretrained models supported by the transformers "
     "library or a path to a custom weights file.",
-    default="gpt2",
+    default="gpt2-large",
     show_default=True,
 )
 @click.option(
@@ -136,7 +230,9 @@ def run(model_name: str, cuda: bool, cache_dir: str, run_discord: bool):
             cmd_str = input("> ")
             try:
                 cmd, text = parse_cmd(cmd_str)
-                cmd_output = handle_cmd(cmd, text, model, tokenizer, device)
+                cmd_output = handle_cmd(
+                    cmd, text, model, tokenizer, device, markdown=False
+                )
             except InvalidCommandError as e:
                 cmd_output = f"ERROR: {str(e)}"
             click.echo(cmd_output)

@@ -157,7 +157,7 @@ class DeathsaurusClient(discord.Client):
             await self.channel.send(cmd_output)
 
     async def on_disconnect(self):
-        await self.chanel.send(":wave: Deathsaurus signing off.")
+        await self.channel.send(":wave: Deathsaurus signing off.")
 
 
 def discord_loop(

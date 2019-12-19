@@ -11,7 +11,7 @@ import torch.nn.functional as F
 import transformers
 from tqdm import trange
 
-MAX_LENGTH = 100
+MAX_LENGTH = 1000
 
 logger = logging.getLogger(__name__)
 
@@ -50,10 +50,10 @@ def generate_text(
     model: nn.Module,
     tokenizer: transformers.PreTrainedTokenizer,
     seed_text: str,
-    device: str,
+    device: torch.device,
     temperature: float = 0.7,
     top_k: int = 0,
-    top_p: int = 0.9,
+    top_p: float = 0.9,
     repetition_penalty: float = 1.0,
     length: int = -1,
     num_samples: int = 1,
@@ -77,7 +77,7 @@ def generate_text(
     context_tokens = tokenizer.encode(seed_text, add_special_tokens=False)
     context_len = len(context_tokens)
 
-    generate_length = model.config.max_position_embeddings - context_len
+    generate_length = model.config.max_position_embeddings - context_len  # type: ignore
     if length > 0:
         generate_length = min(length, generate_length)
     elif generate_length < 0:

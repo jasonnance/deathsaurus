@@ -1,4 +1,4 @@
-.PHONY: build run mkdirs
+.PHONY: build run mkdirs ci
 
 IMAGE_TAG := "deathsaurus"
 ROOT_DIR := $(shell pwd)
@@ -19,3 +19,9 @@ run: build mkdirs
 		$(IMAGE_TAG) \
 		python deathsaurus.py \
 			--cache-dir /cache
+
+ci: build
+	docker run --rm \
+		-it \
+		$(IMAGE_TAG) \
+		./run_ci.sh

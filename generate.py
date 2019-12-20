@@ -51,7 +51,7 @@ def generate_text(
     tokenizer: transformers.PreTrainedTokenizer,
     seed_text: str,
     device: torch.device,
-    temperature: float = 0.1,
+    temperature: float = 0.01,
     top_k: int = 0,
     top_p: float = 0.9,
     repetition_penalty: float = 1.1,
@@ -85,7 +85,7 @@ def generate_text(
         generate_length = MAX_LENGTH
 
     logger.info(
-        f"Generating {generate_length} tokens from context of length {context_len}"
+        f"Generating up to {generate_length} tokens from context of length {context_len}"
     )
 
     generated = (

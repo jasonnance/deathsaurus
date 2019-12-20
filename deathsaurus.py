@@ -36,6 +36,15 @@ class InvalidCommandError(Exception):
 
 
 def parse_cmd(cmd_str: str) -> Tuple[Command, str]:
+    """
+    Parse a bot command from the given command string.
+
+    Args:
+      cmd_str: String containing both a command and whatever text follows it.
+
+    Returns:
+      2-tuple: the type of command and any text associated with it.
+    """
     first_whitespace_ndx = cmd_str.find(" ")
     if first_whitespace_ndx == -1:
         cmd_prefix = cmd_str
@@ -71,6 +80,21 @@ def handle_cmd(
     device: torch.device,
     markdown: bool = False,
 ) -> str:
+    """
+    Handle the given command and return the generated output.
+
+    Args:
+      cmd: Type of command to handle.
+      text: Extra text for the command, if applicable.
+      model: Model to use for the command.
+      tokenizer: Tokenizer to use for parsing the text, if needed.
+      device: Device the model is currently on.
+      markdown: If True, format results assuming they'll be displayed in Markdown.
+        Otherwise, assume raw text output
+
+    Returns:
+      Generated output text.
+    """
     if cmd == Command.HELP:
         return USAGE_STR
     elif cmd == Command.GENERATE_TEXT:
@@ -95,6 +119,17 @@ def handle_cmd(
 
 
 def _verify_env(var_name: str, err_msg: str) -> str:
+    """
+    Verify the given environment variable is set and return its value.
+    Raise an error if it isn't set.
+
+    Args:
+      var_name: Environment variable name
+      err_msg: Error message to show if the variable isn't set
+
+    Returns:
+      The value of the environment variable
+    """
     try:
         return os.environ[var_name]
     except KeyError:
@@ -167,6 +202,14 @@ class DeathsaurusClient(discord.Client):
 def discord_loop(
     model: nn.Module, tokenizer: transformers.PreTrainedTokenizer, device: torch.device
 ):
+    """
+    Run the async Discord bot loop.
+
+    Args:
+      model: Model to use for handling commands.
+      tokenizer: Tokenizer for parsing input and decoding output.
+      device: Device the model is sitting on.
+    """
     discord_token = _verify_env(
         "DISCORD_BOT_TOKEN",
         "Environment variable DISCORD_BOT_TOKEN must be set to the bot token for login.",

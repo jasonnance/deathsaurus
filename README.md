@@ -31,3 +31,14 @@ Export some needed environment variables and run the bot connected to Discord:
 
 - `!xfm_help`: Display usage
 - `!xfm_gen <text>`: Generate text from the given seed
+
+## Parameter Guidelines
+
+### Text Generation
+
+For the GPT2-Large model:
+
+- `temperature = 0.1`: Boring, very realistic text
+- `temperature = 0.7`: Mostly realistic text
+- `temperature = 0.99`: Coherent yet very whacky text
+- `temperature > 5`: Incoherent mass of words

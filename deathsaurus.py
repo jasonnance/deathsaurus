@@ -28,6 +28,7 @@ COMMAND_PREFIX = "!xfm"
 class Command(enum.Enum):
     HELP = f"{COMMAND_PREFIX}_help"
     GENERATE_TEXT = f"{COMMAND_PREFIX}_gen"
+    PING = f"{COMMAND_PREFIX}_ping"
 
 
 class InvalidCommandError(Exception):
@@ -56,6 +57,7 @@ USAGE_STR = "\n".join(
         "Deathsaurus is a bot that can perform a few different tasks using Transformer-based deep learning models.",
         "The currently-supported tasks are:",
         f"  {COMMAND_PREFIX}_help: Show this help text.",
+        f"  {COMMAND_PREFIX}_ping: Return a response to indicate whether the bot is listening.",
         f"  {COMMAND_PREFIX}_gen <text>: Generate text, using <text> as the starting seed text.",
     )
 )
@@ -86,6 +88,8 @@ def handle_cmd(
             return f"**{text}**{generated_text}"
         else:
             return f"{text}{generated_text}"
+    elif cmd == Command.PING:
+        return "pong"
     else:
         raise InvalidCommandError(f"Unimplemented command: {cmd}")
 

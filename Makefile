@@ -19,7 +19,8 @@ run-local: build mkdirs
 		$(IMAGE_TAG) \
 		python deathsaurus.py \
 			--cache-dir /cache \
-			--run-local
+			--run-local \
+			--model-name gpt2-large
 
 run-discord: build mkdirs
 ifndef DISCORD_BOT_TOKEN
@@ -43,7 +44,8 @@ endif
 		$(IMAGE_TAG) \
 		python deathsaurus.py \
 			--cache-dir /cache \
-			--run-discord
+			--run-discord \
+			--model-name gpt2-large
 
 ci: build
 	docker run --rm \

@@ -120,6 +120,8 @@ def generate_text(
                 next_token = torch.multinomial(
                     F.softmax(filtered_logits, dim=-1), num_samples=1
                 )
+            if next_token.cpu().item() == tokenizer.bos_token_id:
+                break
             generated = torch.cat((generated, next_token), dim=1)
 
     generated_only = generated[:, context_len:].tolist()

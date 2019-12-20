@@ -51,7 +51,7 @@ def generate_text(
     tokenizer: transformers.PreTrainedTokenizer,
     seed_text: str,
     device: torch.device,
-    temperature: float = 0.01,
+    temperature: float = 0.7,
     top_k: int = 0,
     top_p: float = 0.9,
     repetition_penalty: float = 1.1,

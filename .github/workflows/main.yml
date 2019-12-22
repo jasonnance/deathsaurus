@@ -1,0 +1,14 @@
+name: CI
+
+on: [push]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+        name: Checkout project
+        
+      - uses: ./.github/actions/main
+        name: Lint

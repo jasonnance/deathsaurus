@@ -2,13 +2,13 @@ import logging
 import os
 
 import click
+
 import discord
 import torch
 import torch.nn as nn
 import transformers
-
-from discord_client import get_bot
-from repl_client import repl
+from deathsaurus.discord_client import get_bot
+from deathsaurus.repl_client import repl
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -92,7 +92,12 @@ def discord_loop(
     "locally on the terminal.",
     default=False,
 )
-def main(model_name: str, cuda: bool, cache_dir: str, run_discord: bool):
+@click.option(
+    "--download-only/--no-download-only",
+    help="If True, only download the model files to the cache directory and exit.",
+    default=False,
+)
+def main(model_name: str, cuda: bool, cache_dir: str, run_discord: bool, download_only: True):
     device = torch.device("cuda" if torch.cuda.is_available() and cuda else "cpu")
     n_gpu = torch.cuda.device_count()
     logger.info(f"Device: {device} ({n_gpu} GPUs)")
@@ -104,6 +109,11 @@ def main(model_name: str, cuda: bool, cache_dir: str, run_discord: bool):
     model = transformers.AutoModelWithLMHead.from_pretrained(
         model_name, cache_dir=cache_dir
     )
+
+    if download_only:
+        logger.info(f"Ensured model '{model_name}' is downloaded to cache directory.")
+        return
+
     model.to(device)
     model.eval()
     logger.info(f"Loaded model and tokenizer: '{model_name}'")

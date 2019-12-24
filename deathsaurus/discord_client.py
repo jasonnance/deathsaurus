@@ -4,10 +4,9 @@ import logging
 import torch
 import torch.nn as nn
 import transformers
+from deathsaurus.util import COMMAND_PREFIX, Command, InvalidCommandError, handle_cmd
 from discord.ext import commands
 from discord.utils import find
-
-from util import COMMAND_PREFIX, Command, InvalidCommandError, handle_cmd
 
 logger = logging.getLogger(__name__)
 

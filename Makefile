@@ -3,10 +3,12 @@
 IMAGE_TAG := "deathsaurus"
 ROOT_DIR := $(shell pwd)
 TRANSFORMER_CACHE_DIR := "$(ROOT_DIR)/data/transformer_cache"
+DIST_DIR := "$(ROOT_DIR)/dist"
 GPU_ARGS := $(if $(shell which nvidia-smi),--gpus all,)
 
 mkdirs:
 	@mkdir -p $(TRANSFORMER_CACHE_DIR)
+	@mkdir -p $(DIST_DIR)
 
 build:
 	docker build -t $(IMAGE_TAG) .
@@ -18,7 +20,7 @@ run-local: build mkdirs
 		-it \
 		-v $(TRANSFORMER_CACHE_DIR):/cache \
 		$(IMAGE_TAG) \
-		python deathsaurus.py \
+		deathsaurus \
 			--cache-dir /cache \
 			--run-local \
 			--model-name gpt2
@@ -43,7 +45,7 @@ endif
 		-e DISCORD_BOT_GUILD=$(DISCORD_BOT_GUILD) \
 		-e DISCORD_BOT_CHANNEL=$(DISCORD_BOT_CHANNEL) \
 		$(IMAGE_TAG) \
-		python deathsaurus.py \
+		deathsaurus \
 			--cache-dir /cache \
 			--run-discord \
 			--model-name gpt2-large

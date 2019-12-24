@@ -5,3 +5,4 @@ RUN pip install -r /base/requirements.txt
 
 WORKDIR /code
 COPY . /code
+RUN pip install /code

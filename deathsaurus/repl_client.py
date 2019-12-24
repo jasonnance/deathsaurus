@@ -1,9 +1,9 @@
 import click
+
 import torch
 import torch.nn as nn
 import transformers
-
-from util import InvalidCommandError, handle_cmd, parse_cmd
+from deathsaurus.util import InvalidCommandError, handle_cmd, parse_cmd
 
 
 def repl(

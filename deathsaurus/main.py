@@ -2,11 +2,11 @@ import logging
 import os
 
 import click
-
 import discord
 import torch
 import torch.nn as nn
 import transformers
+
 from deathsaurus.discord_client import get_bot
 from deathsaurus.repl_client import repl
 
@@ -97,7 +97,9 @@ def discord_loop(
     help="If True, only download the model files to the cache directory and exit.",
     default=False,
 )
-def main(model_name: str, cuda: bool, cache_dir: str, run_discord: bool, download_only: True):
+def main(
+    model_name: str, cuda: bool, cache_dir: str, run_discord: bool, download_only: bool
+):
     device = torch.device("cuda" if torch.cuda.is_available() and cuda else "cpu")
     n_gpu = torch.cuda.device_count()
     logger.info(f"Device: {device} ({n_gpu} GPUs)")

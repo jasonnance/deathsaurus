@@ -1,8 +1,8 @@
 import click
-
 import torch
 import torch.nn as nn
 import transformers
+
 from deathsaurus.util import InvalidCommandError, handle_cmd, parse_cmd
 
 

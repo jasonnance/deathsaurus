@@ -28,6 +28,7 @@ class Deathsaurus(commands.Cog):
         self.model = model
         self.tokenizer = tokenizer
         self.device = device
+        self.running_gen = False
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -61,16 +62,24 @@ class Deathsaurus(commands.Cog):
     @commands.command(help="Generate text from the given seed text.")
     @commands.guild_only()
     async def gen(self, ctx, *, seed_text: str):
-        async with ctx.typing():
-            try:
-                # Run the generation asynchronously so our Discord connection stays active
-                generate_text = functools.partial(
-                    self._handle_cmd, Command.GENERATE_TEXT, seed_text
-                )
-                output = await self.bot.loop.run_in_executor(None, generate_text)
-                await self.channel.send(output)
-            except InvalidCommandError as e:
-                raise commands.BadArgument(str(e))
+        if self.running_gen:
+            await self.channel.send("Sorry, I'm busy at the moment")
+            return
+
+        self.running_gen = True
+        try:
+            async with ctx.typing():
+                try:
+                    # Run the generation asynchronously so our Discord connection stays active
+                    generate_text = functools.partial(
+                        self._handle_cmd, Command.GENERATE_TEXT, seed_text
+                    )
+                    output = await self.bot.loop.run_in_executor(None, generate_text)
+                    await self.channel.send(output)
+                except InvalidCommandError as e:
+                    raise commands.BadArgument(str(e))
+        finally:
+            self.running_gen = False
 
     async def say_bye(self):
         await self.channel.send(":wave: Deathsaurus signing off.")

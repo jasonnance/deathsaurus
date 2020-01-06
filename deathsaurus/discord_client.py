@@ -7,7 +7,7 @@ import transformers
 from discord.ext import commands
 from discord.utils import find
 
-from util import COMMAND_PREFIX, Command, InvalidCommandError, handle_cmd
+from deathsaurus.util import COMMAND_PREFIX, Command, InvalidCommandError, handle_cmd
 
 logger = logging.getLogger(__name__)
 

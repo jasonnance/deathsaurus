@@ -6,7 +6,7 @@ import torch.nn as nn
 import transformers
 from discord.utils import escape_markdown
 
-from generate import generate_text
+from deathsaurus.generate import generate_text
 
 COMMAND_PREFIX = "!xfm_"
 GENERATE_LEN = 200

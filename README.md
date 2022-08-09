@@ -4,34 +4,36 @@ Discord bot to interface with Transformer models.
 
 ## Prerequisites
 
-Requires Docker.  It's strongly recommended to have NVIDIA driver v440+ with a supported NVIDIA GPU and the NVIDIA container runtime for Docker.  You'll also need an [NVIDIA GPU Cloud](https://www.nvidia.com/en-us/gpu-cloud/) account to pull the base Docker image.  The Makefile (hackily) attempts to use a GPU if one is available.
+You probably want a GPU to run the models. Requires Python 3.10+ and the appropriate CUDA libraries installed on your system. Tested in WSLv2 (Ubuntu) on Windows 10.
 
 ## Usage
 
-Make sure you're logged in before pulling the base image:
-
-    docker login nvcr.io
-
-Build the Docker image:
+Build the requirements:
 
     make build
-    
-Run the Docker image to get a local REPL for bot commands:
+
+Run a REPL for bot commands:
 
     make run-local
-    
+
 Export some needed environment variables and run the bot connected to Discord:
 
     export DISCORD_BOT_TOKEN="<your token>"
     export DISCORD_BOT_GUILD="<your server name>"
     export DISCORD_BOT_CHANNEL="<channel where bot should post>"
     make run-discord
-    
+
 ## Commands
 
 - `!xfm_help`: Display usage
 - `!xfm_ping`: Ping the bot to check if it's online
 - `!xfm_gen <text>`: Generate text from the given seed
+
+You can also @ the bot to run commands:
+
+- `@<bot_name> help`
+- `@<bot_name> ping`
+- `@<bot_name> gen`
 
 ## Parameter Guidelines
 

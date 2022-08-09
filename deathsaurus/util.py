@@ -13,9 +13,9 @@ GENERATE_LEN = 200
 
 
 class Command(enum.Enum):
-    HELP = f"help"
-    GENERATE_TEXT = f"gen"
-    PING = f"ping"
+    HELP = "help"
+    GENERATE_TEXT = "gen"
+    PING = "ping"
 
 
 class InvalidCommandError(Exception):
@@ -53,9 +53,9 @@ USAGE_STR = "\n".join(
     (
         "Deathsaurus is a bot that can perform a few different tasks using Transformer-based deep learning models.",
         "The currently-supported tasks are:",
-        f"  help: Show this help text.",
-        f"  ping: Return a response to indicate whether the bot is listening.",
-        f"  gen <text>: Generate text, using <text> as the starting seed text.",
+        "  help: Show this help text.",
+        "  ping: Return a response to indicate whether the bot is listening.",
+        "  gen <text>: Generate text, using <text> as the starting seed text.",
     )
 )
 

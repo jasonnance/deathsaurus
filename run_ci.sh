@@ -4,7 +4,7 @@
 
 set -e
 
-isort -rc --check-only .
+isort --check-only .
 black .
 mypy . --ignore-missing-imports
 flake8 . --config setup.cfg

@@ -1,29 +1,24 @@
 .PHONY: build run-local run-discord mkdirs ci
 
-IMAGE_TAG := "deathsaurus"
 ROOT_DIR := $(shell pwd)
 TRANSFORMER_CACHE_DIR := "$(ROOT_DIR)/data/transformer_cache"
 DIST_DIR := "$(ROOT_DIR)/dist"
-GPU_ARGS := $(if $(shell which nvidia-smi),--gpus all,)
 
 mkdirs:
 	@mkdir -p $(TRANSFORMER_CACHE_DIR)
 	@mkdir -p $(DIST_DIR)
 
 build:
-	docker build -t $(IMAGE_TAG) .
+	pip install -r requirements.txt
+	pip install -e .
 
-run-local: build mkdirs
-	docker run --rm \
-		--ipc host \
-		$(GPU_ARGS) \
-		-it \
-		-v $(TRANSFORMER_CACHE_DIR):/cache \
-		$(IMAGE_TAG) \
-		deathsaurus \
-			--cache-dir /cache \
-			--run-local \
-			--model-name gpt2
+# TODO put back
+#run-local: build mkdirs
+run-local:
+	deathsaurus \
+		--run-local \
+		--cache-dir $(TRANSFORMER_CACHE_DIR) \
+		--model-name gpt2-large
 
 run-discord: build mkdirs
 ifndef DISCORD_BOT_TOKEN
@@ -51,7 +46,4 @@ endif
 			--model-name gpt2-large
 
 ci: build
-	docker run --rm \
-		-it \
-		$(IMAGE_TAG) \
-		./run_ci.sh
+	./run_ci.sh

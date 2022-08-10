@@ -2,3 +2,5 @@ data/
 *.egg-info/
 build/
 dist/
+img/
+wandb/

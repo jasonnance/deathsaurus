@@ -4,7 +4,15 @@ Discord bot to interface with Transformer models.
 
 ## Prerequisites
 
-You probably want a GPU to run the models. Requires Python 3.10+ and the appropriate CUDA libraries installed on your system. Tested in WSLv2 (Ubuntu) on Windows 10.
+You need an NVIDIA GPU to run the models. Requires Python 3.10+ and the appropriate CUDA libraries installed on your system (including cuDNN). Tested in WSLv2 (Ubuntu) on Windows 10.
+
+Jax can't be installed directly by pip in all cases -- see [instructions here](https://github.com/google/jax#installation).
+
+You may need to set the following environment variable:
+
+```
+export XLA_FLAGS="--xla_gpu_force_compilation_parallelism=1"
+```
 
 ## Usage
 
@@ -14,14 +22,23 @@ Build the requirements:
 
 Run a REPL for bot commands:
 
-    make run-local
+    # Text generation
+    make run-local-text
+
+    # Image generation
+    make run-local-image
 
 Export some needed environment variables and run the bot connected to Discord:
 
     export DISCORD_BOT_TOKEN="<your token>"
     export DISCORD_BOT_GUILD="<your server name>"
     export DISCORD_BOT_CHANNEL="<channel where bot should post>"
-    make run-discord
+
+    # Text generation
+    make run-discord-text
+
+    # Image generation
+    make run-discord-image
 
 ## Commands
 

@@ -7,8 +7,9 @@ import torch
 import torch.nn as nn
 import transformers
 
-from deathsaurus.discord_client import get_bot
-from deathsaurus.repl_client import repl
+from deathsaurus import generate_image
+from deathsaurus.discord_client import get_image_bot, get_text_bot
+from deathsaurus.repl_client import image_repl, text_repl
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -38,19 +39,7 @@ def _verify_env(var_name: str, err_msg: str) -> str:
         raise RuntimeError(err_msg)
 
 
-def discord_loop(
-    model: nn.Module,
-    tokenizer: transformers.tokenization_utils.PreTrainedTokenizer,
-    device: torch.device,
-):
-    """
-    Run the async Discord bot loop.
-
-    Args:
-      model: Model to use for handling commands.
-      tokenizer: Tokenizer for parsing input and decoding output.
-      device: Device the model is sitting on.
-    """
+def get_discord_env():
     discord_token = _verify_env(
         "DISCORD_BOT_TOKEN",
         "Environment variable DISCORD_BOT_TOKEN must be set to the bot token for login.",
@@ -63,44 +52,29 @@ def discord_loop(
         "DISCORD_BOT_CHANNEL",
         "Environment variable DISCORD_BOT_CHANNEL must be set to the channel name to post in.",
     )
-    bot = get_bot(discord_guild, discord_channel, model, tokenizer, device)
+    return discord_token, discord_guild, discord_channel
+
+
+def text_discord_loop(
+    model: nn.Module,
+    tokenizer: transformers.tokenization_utils.PreTrainedTokenizer,
+    device: torch.device,
+):
+    """
+    Run the async Discord bot loop for text.
+
+    Args:
+      model: Model to use for handling commands.
+      tokenizer: Tokenizer for parsing input and decoding output.
+      device: Device the model is sitting on.
+    """
+    discord_token, discord_guild, discord_channel = get_discord_env()
+    bot = get_text_bot(discord_guild, discord_channel, model, tokenizer, device)
     bot.run(discord_token)
 
 
-@click.command()
-@click.option(
-    "--model-name",
-    help="Transformer model weights to use.  The model must "
-    "be the name of one of the pretrained models supported by the transformers "
-    "library or a path to a custom weights file.",
-    default="gpt2-large",
-    show_default=True,
-)
-@click.option(
-    "--cuda/--no-cuda",
-    help="Whether to use GPU.  Defaults to GPU if available.",
-    default=True,
-)
-@click.option(
-    "--cache-dir",
-    help="Directory to cache transformers weights downloads.",
-    default="/cache",
-    type=click.Path(exists=True, file_okay=False, writable=True),
-    show_default=True,
-)
-@click.option(
-    "--run-discord/--run-local",
-    help="Whether to run the bot accepting input from a Discord server or "
-    "locally on the terminal.",
-    default=False,
-)
-@click.option(
-    "--download-only/--no-download-only",
-    help="If True, only download the model files to the cache directory and exit.",
-    default=False,
-)
-def main(
-    model_name: str, cuda: bool, cache_dir: str, run_discord: bool, download_only: bool
+def run_text(
+    model_name: str, cuda: bool, cache_dir: str, download_only: bool, run_discord: bool
 ):
     device = torch.device("cuda" if torch.cuda.is_available() and cuda else "cpu")
     n_gpu = torch.cuda.device_count()
@@ -123,9 +97,97 @@ def main(
     logger.info(f"Loaded model and tokenizer: '{model_name}'")
 
     if run_discord:
-        discord_loop(model, tokenizer, device)
+        text_discord_loop(model, tokenizer, device)
     else:
-        repl(model, tokenizer, device)
+        text_repl(model, tokenizer, device)
+
+
+def image_discord_loop(dalle_model, dalle_params, vqgan, vqgan_params, dalle_processor):
+    """
+    Run the async Discord bot loop for images.
+    """
+    discord_token, discord_guild, discord_channel = get_discord_env()
+    bot = get_image_bot(
+        discord_guild,
+        discord_channel,
+        dalle_model,
+        dalle_params,
+        vqgan,
+        vqgan_params,
+        dalle_processor,
+    )
+    bot.run(discord_token)
+
+
+def run_image(run_discord: bool):
+    (
+        dalle_model,
+        dalle_params,
+        vqgan,
+        vqgan_params,
+        dalle_processor,
+    ) = generate_image.init_models()
+
+    if run_discord:
+        image_discord_loop(
+            dalle_model, dalle_params, vqgan, vqgan_params, dalle_processor
+        )
+    else:
+        image_repl(dalle_model, dalle_params, vqgan, vqgan_params, dalle_processor)
+
+
+@click.command()
+@click.option(
+    "--mode",
+    help="What to generate.  text or image",
+    required=True,
+    type=click.Choice(["text", "image"]),
+)
+@click.option(
+    "--text-model-name",
+    help="Transformer model weights to use.  The model must "
+    "be the name of one of the pretrained models supported by the transformers "
+    "library or a path to a custom weights file.  Ignored if mode = image.",
+    default="gpt2-large",
+    show_default=True,
+)
+@click.option(
+    "--cuda/--no-cuda",
+    help="Whether to use GPU.  Defaults to GPU if available. Ignored if mode = image.",
+    default=True,
+)
+@click.option(
+    "--cache-dir",
+    help="Directory to cache transformers weights downloads. Ignored if mode = image.",
+    default="/tmp",
+    type=click.Path(exists=True, file_okay=False, writable=True),
+    show_default=True,
+)
+@click.option(
+    "--run-discord/--run-local",
+    help="Whether to run the bot accepting input from a Discord server or "
+    "locally on the terminal.",
+    default=False,
+)
+@click.option(
+    "--download-only/--no-download-only",
+    help="If True, only download the model files to the cache directory and exit. Ignored if mode = image.",
+    default=False,
+)
+def main(
+    mode: str,
+    text_model_name: str,
+    cuda: bool,
+    cache_dir: str,
+    run_discord: bool,
+    download_only: bool,
+):
+    if mode == "text":
+        run_text(text_model_name, cuda, cache_dir, run_discord, download_only)
+    elif mode == "image":
+        run_image(run_discord)
+    else:
+        raise ValueError(f"unsupported mode: {mode}")
 
 
 if __name__ == "__main__":

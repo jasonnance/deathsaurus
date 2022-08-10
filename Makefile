@@ -31,19 +31,10 @@ ifndef DISCORD_BOT_CHANNEL
 	$(error "Set the DISCORD_BOT_CHANNEL variable to the channel name you want your bot to post in.")
 endif
 
-	docker run --rm \
-		--ipc host \
-		$(GPU_ARGS) \
-		-it \
-		-v $(TRANSFORMER_CACHE_DIR):/cache \
-		-e DISCORD_BOT_TOKEN=$(DISCORD_BOT_TOKEN) \
-		-e DISCORD_BOT_GUILD=$(DISCORD_BOT_GUILD) \
-		-e DISCORD_BOT_CHANNEL=$(DISCORD_BOT_CHANNEL) \
-		$(IMAGE_TAG) \
-		deathsaurus \
-			--cache-dir /cache \
-			--run-discord \
-			--model-name gpt2-large
+	deathsaurus \
+		--run-discord \
+		--cache-dir $(TRANSFORMER_CACHE_DIR) \
+		--model-name gpt2-large
 
 ci: build
 	./run_ci.sh

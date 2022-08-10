@@ -39,7 +39,9 @@ def _verify_env(var_name: str, err_msg: str) -> str:
 
 
 def discord_loop(
-    model: nn.Module, tokenizer: transformers.PreTrainedTokenizer, device: torch.device
+    model: nn.Module,
+    tokenizer: transformers.tokenization_utils.PreTrainedTokenizer,
+    device: torch.device,
 ):
     """
     Run the async Discord bot loop.

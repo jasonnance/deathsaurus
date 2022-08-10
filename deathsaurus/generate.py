@@ -48,7 +48,7 @@ def top_k_top_p_filtering(logits, top_k=0, top_p=0.0, filter_value=-float("Inf")
 def generate_text(
     *,
     model: nn.Module,
-    tokenizer: transformers.PreTrainedTokenizer,
+    tokenizer: transformers.tokenization_utils.PreTrainedTokenizer,
     seed_text: str,
     device: torch.device,
     temperature: float = 0.995,
@@ -79,7 +79,7 @@ def generate_text(
 
     generate_length = model.config.max_position_embeddings - context_len  # type: ignore
     if length > 0:
-        generate_length = min(length, generate_length)
+        generate_length = min(length, generate_length)  # type: ignore
     elif generate_length < 0:
         # Avoid an infinite generation loop
         generate_length = MAX_LENGTH

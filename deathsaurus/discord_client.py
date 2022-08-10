@@ -19,7 +19,7 @@ class Deathsaurus(commands.Cog):
         guild: str,
         channel: str,
         model: nn.Module,
-        tokenizer: transformers.PreTrainedTokenizer,
+        tokenizer: transformers.tokenization_utils.PreTrainedTokenizer,
         device: torch.device,
     ):
         self.bot = bot
@@ -93,7 +93,7 @@ def get_bot(
     guild: str,
     channel: str,
     model: nn.Module,
-    tokenizer: transformers.PreTrainedTokenizer,
+    tokenizer: transformers.tokenization_utils.PreTrainedTokenizer,
     device: torch.device,
 ) -> commands.Bot:
     """

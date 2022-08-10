@@ -64,7 +64,7 @@ def handle_cmd(
     cmd: Command,
     text: str,
     model: nn.Module,
-    tokenizer: transformers.PreTrainedTokenizer,
+    tokenizer: transformers.tokenization_utils.PreTrainedTokenizer,
     device: torch.device,
     markdown: bool = False,
 ) -> str:

@@ -7,7 +7,9 @@ from deathsaurus.util import InvalidCommandError, handle_cmd, parse_cmd
 
 
 def repl(
-    model: nn.Module, tokenizer: transformers.PreTrainedTokenizer, device: torch.device
+    model: nn.Module,
+    tokenizer: transformers.tokenization_utils.PreTrainedTokenizer,
+    device: torch.device,
 ):
     """
     Run a read-eval-print loop through the command line.

@@ -48,7 +48,7 @@ def parse_cmd(cmd_str: str) -> Tuple[Command, str]:
         cmd_text = cmd_str[first_whitespace_ndx:].strip()
 
     try:
-        cmd = Command(cmd_name)
+        cmd = Command(cmd_name.lower())
     except ValueError:
         raise InvalidCommandError(f"Unknown command name: '{cmd_name}'")
 

@@ -102,14 +102,14 @@ def generate_images(
     Generate a set of images from a prompt, write each to a BytesIO buffer,
     and yield each one.
     """
-    logger.info("Generating %d images for prompt: %s", n_images_per_prompt, prompt)
+    logger.info(f"Generating {n_images_per_prompt} images for prompt: {prompt}")
     # Tokenize the prompt
     tokenized_prompts = dalle_processor([prompt])
     tokenized_prompts = replicate(tokenized_prompts)
 
     # Get a new key
     for i in range(n_images_per_prompt):
-        logger.info("Generating image %d", i)
+        logger.info(f"Generating image {i}")
         global KEY
         KEY, sub_key = jax.random.split(KEY)
 

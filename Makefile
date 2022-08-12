@@ -17,7 +17,7 @@ run-local-text:
 		--mode text \
 		--run-local \
 		--cache-dir $(TRANSFORMER_CACHE_DIR) \
-		--model-name gpt2-large
+		--text-model-name gpt2-large
 
 run-local-image:
 	deathsaurus \
@@ -34,13 +34,16 @@ endif
 ifndef DISCORD_BOT_CHANNEL
 	$(error "Set the DISCORD_BOT_CHANNEL variable to the channel name you want your bot to post in.")
 endif
+ifndef DISCORD_BOT_HOF_CHANNEL
+	$(error "Set the DISCORD_BOT_HOF_CHANNEL variable to the channel name you want your bot to post hall of fame messages in.")
+endif
 
 run-discord-text: discord-vars
 	deathsaurus \
 		--mode text \
 		--run-discord \
 		--cache-dir $(TRANSFORMER_CACHE_DIR) \
-		--model-name gpt2-large
+		--text-model-name gpt2-large
 
 run-discord-image: discord-vars
 	deathsaurus \

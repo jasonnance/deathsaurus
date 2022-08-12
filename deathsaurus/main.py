@@ -1,4 +1,3 @@
-import logging
 import os
 
 import click
@@ -6,17 +5,11 @@ import discord
 import torch
 import torch.nn as nn
 import transformers
+from loguru import logger
 
 from deathsaurus import generate_image
 from deathsaurus.discord_client import get_image_bot, get_text_bot
 from deathsaurus.repl_client import image_repl, text_repl
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(
-    format="[%(asctime)s] %(levelname)s: %(message)s",
-    datefmt="%Y-%m-%d %H:%M:S",
-    level=logging.INFO,
-)
 
 discord_client = discord.Client()
 
@@ -52,7 +45,12 @@ def get_discord_env():
         "DISCORD_BOT_CHANNEL",
         "Environment variable DISCORD_BOT_CHANNEL must be set to the channel name to post in.",
     )
-    return discord_token, discord_guild, discord_channel
+    discord_hof_channel = _verify_env(
+        "DISCORD_BOT_HOF_CHANNEL",
+        "Environment variable DISCORD_BOT_HOF_CHANNEL must be set to the channel name to "
+        "use for the Hall of Fame.",
+    )
+    return discord_token, discord_guild, discord_channel, discord_hof_channel
 
 
 def text_discord_loop(
@@ -68,8 +66,15 @@ def text_discord_loop(
       tokenizer: Tokenizer for parsing input and decoding output.
       device: Device the model is sitting on.
     """
-    discord_token, discord_guild, discord_channel = get_discord_env()
-    bot = get_text_bot(discord_guild, discord_channel, model, tokenizer, device)
+    (
+        discord_token,
+        discord_guild,
+        discord_channel,
+        discord_hof_channel,
+    ) = get_discord_env()
+    bot = get_text_bot(
+        discord_guild, discord_channel, discord_hof_channel, model, tokenizer, device
+    )
     bot.run(discord_token)
 
 
@@ -106,10 +111,16 @@ def image_discord_loop(dalle_model, dalle_params, vqgan, vqgan_params, dalle_pro
     """
     Run the async Discord bot loop for images.
     """
-    discord_token, discord_guild, discord_channel = get_discord_env()
+    (
+        discord_token,
+        discord_guild,
+        discord_channel,
+        discord_hof_channel,
+    ) = get_discord_env()
     bot = get_image_bot(
         discord_guild,
         discord_channel,
+        discord_hof_channel,
         dalle_model,
         dalle_params,
         vqgan,
@@ -183,7 +194,7 @@ def main(
     download_only: bool,
 ):
     if mode == "text":
-        run_text(text_model_name, cuda, cache_dir, run_discord, download_only)
+        run_text(text_model_name, cuda, cache_dir, download_only, run_discord)
     elif mode == "image":
         run_image(run_discord)
     else:

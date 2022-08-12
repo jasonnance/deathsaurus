@@ -33,6 +33,7 @@ Export some needed environment variables and run the bot connected to Discord:
     export DISCORD_BOT_TOKEN="<your token>"
     export DISCORD_BOT_GUILD="<your server name>"
     export DISCORD_BOT_CHANNEL="<channel where bot should post>"
+    export DISCORD_BOT_HOF_CHANNEL="<channel where bot should make hall-of-fame posts>"
 
     # Text generation
     make run-discord-text

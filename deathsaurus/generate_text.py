@@ -3,17 +3,14 @@ Adapted from:
 https://github.com/huggingface/transformers/blob/e92bcb7eb6c5b9b6ed313cc74abaab50b3dc674f/examples/run_generation.py
 """
 
-import logging
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import transformers
+from loguru import logger
 from tqdm import trange
 
 MAX_LENGTH = 1000
-
-logger = logging.getLogger(__name__)
 
 
 def top_k_top_p_filtering(logits, top_k=0, top_p=0.0, filter_value=-float("Inf")):

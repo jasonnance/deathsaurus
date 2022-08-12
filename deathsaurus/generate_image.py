@@ -3,7 +3,6 @@ Inference code for DALL-E Mini, adapted from:
 https://github.com/borisdayma/dalle-mini/blob/main/tools/inference/inference_pipeline.ipynb
 """
 import io
-import logging
 import random
 import typing
 from functools import partial
@@ -14,10 +13,9 @@ import numpy as np
 from dalle_mini import DalleBart, DalleBartProcessor
 from flax.jax_utils import replicate
 from flax.training.common_utils import shard_prng_key
+from loguru import logger
 from PIL import Image
 from vqgan_jax.modeling_flax_vqgan import VQModel
-
-logger = logging.getLogger(__name__)
 
 # create a random key
 SEED = random.randint(0, 2**32 - 1)

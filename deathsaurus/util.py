@@ -22,6 +22,7 @@ class Command(enum.Enum):
     HELP = "help"
     GENERATE = "gen"
     PING = "ping"
+    HALL_OF_FAME = "hof"
 
 
 class InvalidCommandError(Exception):
@@ -62,6 +63,7 @@ TEXT_USAGE_STR = "\n".join(
         "  help: Show this help text.",
         "  ping: Return a response to indicate whether the bot is listening.",
         "  gen <text>: Generate text, using <text> as the starting seed text.",
+        "  hof: Show instructions for using the Hall of Fame.",
     )
 )
 
@@ -72,6 +74,14 @@ IMAGE_USAGE_STR = "\n".join(
         "  help: Show this help text.",
         "  ping: Return a response to indicate whether the bot is listening.",
         "  gen <text>: Generate images, using <text> as the starting seed text.",
+        "  hof: Show instructions for using the Hall of Fame.",
+    )
+)
+
+HOF_USAGE_STR = "\n".join(
+    (
+        "React to one of Deathsaurus' messages with a '🏆' to have Deathsaurus",
+        "save the message to the configured Hall of Fame channel.",
     )
 )
 
@@ -118,6 +128,8 @@ def handle_cmd_text(
             return f"{text}{generated_text}"
     elif cmd == Command.PING:
         return "pong"
+    elif cmd == Command.HALL_OF_FAME:
+        return HOF_USAGE_STR
     else:
         raise InvalidCommandError(f"Unimplemented command: {cmd}")
 
@@ -153,5 +165,7 @@ def handle_cmd_image(
         ]
     elif cmd == Command.PING:
         return "pong"
+    elif cmd == Command.HALL_OF_FAME:
+        return HOF_USAGE_STR
     else:
         raise InvalidCommandError(f"Unimplemented command: {cmd}")

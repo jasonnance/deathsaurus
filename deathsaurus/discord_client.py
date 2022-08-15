@@ -133,10 +133,6 @@ class Deathsaurus(commands.Cog):
     async def say_bye(self):
         await self.channel.send(f":wave: {self.name} signing off.")
 
-    @commands.Cog.listener()
-    async def on_disconnect(self):
-        await self.say_bye()
-
 
 class DeathsaurusText(Deathsaurus):
     def __init__(

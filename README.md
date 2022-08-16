@@ -4,14 +4,21 @@ Discord bot to interface with Transformer models.
 
 ## Prerequisites
 
-You need an NVIDIA GPU to run the models. Requires Python 3.10+ and the appropriate CUDA libraries installed on your system (including cuDNN). Tested in WSLv2 (Ubuntu) on Windows 10.
+You need an NVIDIA GPU to run the models. Requires Python 3.10+ and the appropriate CUDA libraries installed on your system (including cuDNN). Tested in WSL2 (Ubuntu) on Windows 10.
 
 Jax can't be installed directly by pip in all cases -- see [instructions here](https://github.com/google/jax#installation).
 
 You may need to set the following environment variable:
 
 ```
+# You may get an error about compilation parallelism if this isn't set
 export XLA_FLAGS="--xla_gpu_force_compilation_parallelism=1"
+
+# Make sure your CUDA libraries are on LD_LIBRARY_PATH --
+# this is the default install location for WSL2
+export CUDA_HOME=/usr/local/cuda
+export PATH="$CUDA_HOME/bin:$PATH"
+export LD_LIBRARY_PATH="$CUDA_HOME/lib64:$LD_LIBRARY_PATH"
 ```
 
 ## Usage
@@ -43,15 +50,17 @@ Export some needed environment variables and run the bot connected to Discord:
 
 ## Commands
 
-- `!xfm_help`: Display usage
-- `!xfm_ping`: Ping the bot to check if it's online
-- `!xfm_gen <text>`: Generate text from the given seed
+- `!deathsaurus_help`: Display usage
+- `!deathsaurus_ping`: Ping the bot to check if it's online
+- `!deathsaurus_gen <text>`: Generate text from the given seed
+- `!deathsaurus_hof`: Print instructions on using the Hall of Fame
 
 You can also @ the bot to run commands:
 
 - `@<bot_name> help`
 - `@<bot_name> ping`
 - `@<bot_name> gen`
+- `@<bot_name> hof`
 
 ## Parameter Guidelines
 

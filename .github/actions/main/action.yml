@@ -1,6 +1,0 @@
-name: 'Linting via Docker container'
-runs:
-  using: 'docker'
-  image: '../../../Dockerfile'
-  args:
-    - ./run_ci.sh

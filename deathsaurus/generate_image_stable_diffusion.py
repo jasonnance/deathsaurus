@@ -8,6 +8,15 @@ from diffusers import StableDiffusionPipeline
 logger = logging.getLogger(__name__)
 
 
+class NullSafetyChecker:
+    """Null safety checker which doesn't actually perform safety
+    checking."""
+
+    def __call__(self, images, **kwargs):
+        # Don't check anything, just return the images
+        return images, False
+
+
 def init_model(hf_hub_token: str, cuda: bool):
     """
     Return a HuggingFace pipeline for image generation based on the Stable
@@ -21,6 +30,7 @@ def init_model(hf_hub_token: str, cuda: bool):
         "CompVis/stable-diffusion-v1-4",
         revision="fp16",
         torch_dtype=torch.float16,
+        safety_checker=NullSafetyChecker(),
         use_auth_token=hf_hub_token,
     ).to(device)
 

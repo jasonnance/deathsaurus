@@ -21,6 +21,14 @@ export PATH="$CUDA_HOME/bin:$PATH"
 export LD_LIBRARY_PATH="$CUDA_HOME/lib64:$LD_LIBRARY_PATH"
 ```
 
+To use Stable Diffusion, you need a [HuggingFace Hub account with an access token](https://huggingface.co/docs/hub/security-tokens). Set your access token as an environment variable:
+
+```
+export HF_HUB_TOKEN="<your token>"
+```
+
+You also need to accept the model license [here](https://huggingface.co/CompVis/stable-diffusion-v1-4).
+
 ## Usage
 
 Build the requirements:

@@ -190,18 +190,10 @@ class DeathsaurusImage(Deathsaurus):
         guild: str,
         channel: str,
         hof_channel: str,
-        dalle_model,
-        dalle_params,
-        vqgan,
-        vqgan_params,
-        dalle_processor,
+        pipe,
     ):
         super().__init__(bot, guild, channel, hof_channel)
-        self.dalle_model = dalle_model
-        self.dalle_params = dalle_params
-        self.vqgan = vqgan
-        self.vqgan_params = vqgan_params
-        self.dalle_processor = dalle_processor
+        self.pipe = pipe
 
         self.running_gen = False
 
@@ -213,11 +205,7 @@ class DeathsaurusImage(Deathsaurus):
         return handle_cmd_image(
             cmd,
             text,
-            self.dalle_model,
-            self.dalle_params,
-            self.vqgan,
-            self.vqgan_params,
-            self.dalle_processor,
+            self.pipe,
         )
 
     @commands.command(help="Generate images from the given seed text.")
@@ -291,11 +279,7 @@ def get_image_bot(
     guild: str,
     channel: str,
     hof_channel: str,
-    dalle_model,
-    dalle_params,
-    vqgan,
-    vqgan_params,
-    dalle_processor,
+    pipe,
 ) -> commands.Bot:
     bot = commands.Bot(
         command_prefix=commands.when_mentioned_or(COMMAND_PREFIX),
@@ -307,11 +291,7 @@ def get_image_bot(
             guild,
             channel,
             hof_channel,
-            dalle_model,
-            dalle_params,
-            vqgan,
-            vqgan_params,
-            dalle_processor,
+            pipe,
         )
     )
     return bot

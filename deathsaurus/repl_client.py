@@ -59,7 +59,7 @@ def text_repl(
     return _repl(handle_func)
 
 
-def image_repl(dalle_model, dalle_params, vqgan, vqgan_params, dalle_processor):
+def image_repl(pipe):
     """
     Run a read-eval-print loop through the command line.  Clears out existing
     images.
@@ -76,15 +76,7 @@ def image_repl(dalle_model, dalle_params, vqgan, vqgan_params, dalle_processor):
         print(f"Image saved to: {filename}")
 
     def handle_func(cmd, text):
-        result = handle_cmd_image(
-            cmd,
-            text,
-            dalle_model,
-            dalle_params,
-            vqgan,
-            vqgan_params,
-            dalle_processor,
-        )
+        result = handle_cmd_image(cmd, text, pipe)
         if isinstance(result, str):
             return result
         elif isinstance(result, list):

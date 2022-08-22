@@ -6,7 +6,7 @@ import torch.nn as nn
 import transformers
 from discord.utils import escape_markdown
 
-from deathsaurus.generate_image import generate_images
+from deathsaurus.generate_image_stable_diffusion import generate_images
 from deathsaurus.generate_text import generate_text
 
 COMMAND_PREFIX = "!deathsaurus_"
@@ -137,11 +137,7 @@ def handle_cmd_text(
 def handle_cmd_image(
     cmd: Command,
     text: str,
-    dalle_model,
-    dalle_params,
-    vqgan,
-    vqgan_params,
-    dalle_processor,
+    pipe,
 ):
     """
     Handle the given command and return the generated output for image generation.
@@ -155,12 +151,8 @@ def handle_cmd_image(
             img
             for img in generate_images(
                 prompt=text,
+                pipe=pipe,
                 n_images_per_prompt=IMAGE_GENERATE_LEN,
-                dalle_model=dalle_model,
-                dalle_params=dalle_params,
-                vqgan=vqgan,
-                vqgan_params=vqgan_params,
-                dalle_processor=dalle_processor,
             )
         ]
     elif cmd == Command.PING:

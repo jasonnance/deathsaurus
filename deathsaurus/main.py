@@ -7,7 +7,7 @@ import torch.nn as nn
 import transformers
 from loguru import logger
 
-from deathsaurus import generate_image
+from deathsaurus import generate_image_stable_diffusion
 from deathsaurus.discord_client import get_image_bot, get_text_bot
 from deathsaurus.repl_client import image_repl, text_repl
 
@@ -32,6 +32,15 @@ def _verify_env(var_name: str, err_msg: str) -> str:
         raise RuntimeError(err_msg)
 
 
+def get_hf_env():
+    hf_hub_token = _verify_env(
+        "HF_HUB_TOKEN",
+        "Environment variable HF_HUB_TOKEN must be set to a valid token for accessing "
+        "HuggingFace Hub.",
+    )
+    return hf_hub_token
+
+
 def get_discord_env():
     discord_token = _verify_env(
         "DISCORD_BOT_TOKEN",
@@ -50,7 +59,12 @@ def get_discord_env():
         "Environment variable DISCORD_BOT_HOF_CHANNEL must be set to the channel name to "
         "use for the Hall of Fame.",
     )
-    return discord_token, discord_guild, discord_channel, discord_hof_channel
+    return (
+        discord_token,
+        discord_guild,
+        discord_channel,
+        discord_hof_channel,
+    )
 
 
 def text_discord_loop(
@@ -86,10 +100,10 @@ def run_text(
     logger.info(f"Device: {device} ({n_gpu} GPUs)")
 
     logger.info("Loading model and tokenizer...")
-    tokenizer = transformers.AutoTokenizer.from_pretrained(
+    tokenizer = transformers.AutoTokenizer.from_pretrained(  # type: ignore
         model_name, cache_dir=cache_dir
     )
-    model = transformers.AutoModelWithLMHead.from_pretrained(
+    model = transformers.AutoModelWithLMHead.from_pretrained(  # type: ignore
         model_name, cache_dir=cache_dir
     )
 
@@ -107,7 +121,7 @@ def run_text(
         text_repl(model, tokenizer, device)
 
 
-def image_discord_loop(dalle_model, dalle_params, vqgan, vqgan_params, dalle_processor):
+def image_discord_loop(pipe):
     """
     Run the async Discord bot loop for images.
     """
@@ -121,30 +135,19 @@ def image_discord_loop(dalle_model, dalle_params, vqgan, vqgan_params, dalle_pro
         discord_guild,
         discord_channel,
         discord_hof_channel,
-        dalle_model,
-        dalle_params,
-        vqgan,
-        vqgan_params,
-        dalle_processor,
+        pipe,
     )
     bot.run(discord_token)
 
 
-def run_image(run_discord: bool):
-    (
-        dalle_model,
-        dalle_params,
-        vqgan,
-        vqgan_params,
-        dalle_processor,
-    ) = generate_image.init_models()
+def run_image(run_discord: bool, cuda: bool):
+    hf_hub_token = get_hf_env()
+    pipe = generate_image_stable_diffusion.init_model(hf_hub_token, cuda)
 
     if run_discord:
-        image_discord_loop(
-            dalle_model, dalle_params, vqgan, vqgan_params, dalle_processor
-        )
+        image_discord_loop(pipe)
     else:
-        image_repl(dalle_model, dalle_params, vqgan, vqgan_params, dalle_processor)
+        image_repl(pipe)
 
 
 @click.command()
@@ -196,7 +199,7 @@ def main(
     if mode == "text":
         run_text(text_model_name, cuda, cache_dir, download_only, run_discord)
     elif mode == "image":
-        run_image(run_discord)
+        run_image(run_discord, cuda)
     else:
         raise ValueError(f"unsupported mode: {mode}")
 

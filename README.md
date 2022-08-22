@@ -29,6 +29,8 @@ export HF_HUB_TOKEN="<your token>"
 
 You also need to accept the model license [here](https://huggingface.co/CompVis/stable-diffusion-v1-4).
 
+**NOTE**: The NSFW safety checker on Stable Diffusion is **disabled**. The model will generate NSFW content and should not be used anywhere that might be a problem.
+
 ## Usage
 
 Build the requirements:

@@ -6,12 +6,13 @@ black~=22.6
 flake8~=5.0
 isort~=5.10
 mypy~=0.971
-dalle-mini~=0.1
-git+https://github.com/patil-suraj/vqgan-jax.git@10ef240#egg=vqgan_jax
 diffusers~=0.2
 scipy~=1.9
 ftfy~=6.1
 
+# DALL-E Mini dependencies
+# dalle-mini~=0.1
+# git+https://github.com/patil-suraj/vqgan-jax.git@10ef240#egg=vqgan_jax
 # See GitHub README for installing this:
 # https://github.com/google/jax#installation
-jax[cuda]==0.3.14
+# jax[cuda]==0.3.14

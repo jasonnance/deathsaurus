@@ -1,11 +1,9 @@
 import io
-import logging
 import typing
 
 import torch
 from diffusers import StableDiffusionPipeline
-
-logger = logging.getLogger(__name__)
+from loguru import logger
 
 
 class NullSafetyChecker:
